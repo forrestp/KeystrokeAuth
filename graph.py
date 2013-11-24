@@ -22,4 +22,21 @@ pyplot.clf()
 for b in a:
   pyplot.plot([x[u'up'] - x[u'down'] for x in json.loads(b)])
 pyplot.savefig('dwell.png')
+pyplot.clf()
 
+for b in a:
+  b=json.loads(b)
+  x = []
+  for i in range(len(b)-1):
+    x.append(b[i+1][u'down']-b[i][u'down'])
+  pyplot.plot(x)
+pyplot.savefig('down_down.png')
+pyplot.clf()
+
+for b in a:
+  b=json.loads(b)
+  x = []
+  for i in range(len(b)-1):
+    x.append(b[i+1][u'up']-b[i][u'up'])
+  pyplot.plot(x)
+pyplot.savefig('up_up.png')
