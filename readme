@@ -1,0 +1,11 @@
+Install:
+
+If you want to generate graphs, run 
+
+# pip install -r requirements.txt
+
+Usage:
+
+Open login.html and type in the password field. Submit the form to display timestamps for each key press
+
+To generate graphs, copy the output from the browser into graphs.py 

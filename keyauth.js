@@ -67,7 +67,7 @@ function pwKeyUp(evt) {
 function formSubmit() {
     var json = JSON.stringify(keystrokes);
     document.getElementById("keystrokes").value = json;
-    document.getElementById("output").innerHTML += json + "<br>";
+    document.getElementById("output").innerHTML += "'" + json + "',<br>";
     reset();
     return false;
 }
