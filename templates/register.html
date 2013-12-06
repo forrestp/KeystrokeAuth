@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<body>
+<script src="/keyauth.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<h1>KeystrokeAuth Register Demo</h1>
+
+<form method="post" action="/register" onsubmit="return formSubmit()">
+    Username: <input type="text" name="username" id="username"><br>
+    Password: <input type="password" name="password" id="password" 
+        onkeydown="pwKeyDown()" onkeyup="pwKeyUp()" onfocus="pwFocus()"><br>
+    <input type="hidden" name="timings" id="keystrokes">
+    <input type="submit" value="Submit">
+</form>
+<p id="output">Outputs:<br>[
+</p>
+{{output}}
+<p>]</p>
+</body>
+{% if success %}
+Success: {{success}}
+{% endif%}
+</html>
