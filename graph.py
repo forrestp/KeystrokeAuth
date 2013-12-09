@@ -10,26 +10,48 @@ a = [ '[{"code":72,"down":0,"up":144},{"code":69,"down":152,"up":256},{"code":76
 '[{"code":72,"down":0,"up":144},{"code":69,"down":148,"up":288},{"code":76,"down":312,"up":424},{"code":76,"down":488,"up":600},{"code":79,"down":688,"up":824}]',
 
 ]
+
+
+
+
+
+counter = 0
+colors = {}
 for b in a:
-  pyplot.plot([x[u'down'] for x in json.loads(b)])
+  b = json.loads(b)
+  temp_sum = 0
+  for i in range(len(b)):
+    temp_sum += b[i]["code"]
+  if not (temp_sum in colors):
+    colors[temp_sum] = counter
+    counter += 1
+  print temp_sum
+print colors
+
+for b in a:
+  pyplot.plot([x.get(u'down',0) for x in json.loads(b)])
 pyplot.savefig('down.png')
 pyplot.clf()
+
 for b in a:
-  pyplot.plot([x[u'up'] for x in json.loads(b)])
+  pyplot.plot([x.get(u'up',0) for x in json.loads(b)])
 pyplot.savefig('up.png')
 pyplot.clf()
 
 for b in a:
-  pyplot.plot([x[u'up'] - x[u'down'] for x in json.loads(b)])
+  pyplot.plot([x.get(u'up',0) - x.get(u'down',0) for x in json.loads(b)])
 pyplot.savefig('dwell.png')
 pyplot.clf()
 
 for b in a:
   b=json.loads(b)
   x = []
+  temp_sum = 0
   for i in range(len(b)-1):
     x.append(b[i+1][u'down']-b[i][u'down'])
-  pyplot.plot(x)
+    temp_sum += b[i]["code"]
+  temp_sum += b[-1]["code"]
+  pyplot.plot(x, ['b','g','r','c','m','y','k','b','g','r','c','m','y','k'][colors[temp_sum]])
 pyplot.savefig('down_down.png')
 pyplot.clf()
 
@@ -37,6 +59,6 @@ for b in a:
   b=json.loads(b)
   x = []
   for i in range(len(b)-1):
-    x.append(b[i+1][u'up']-b[i][u'up'])
+    x.append(b[i+1].get(u'up',0)-b[i].get(u'up',0))
   pyplot.plot(x)
 pyplot.savefig('up_up.png')
