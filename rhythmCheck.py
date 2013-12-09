@@ -1,22 +1,41 @@
 import numpy as np
 
-def checkTimings(testTiming, realTiming):
+def checkTimings(testTiming, realTiming, S):
 	np_test = np.array(testTiming)
 	np_real = np.array(realTiming)
 	n = len(testTiming)
 
-	# Currenly the identity matrix
-	S = np.identity(n)
-
 	# calculate mahabolonis distance
-	temp = np.dot(np.dot(np.transpose(np_test - np_real), np.linalg.inv(S)),(np_test - np_real))
-	print temp
+	#inverse_S = np.linalg.inv(S)
+	temp = np.dot(np.dot(np.transpose(np_test - np_real), S),(np_test - np_real))
 	mh_distance = temp ** 0.5
 
 	print mh_distance
 	return True
 
+# takes in initial timing data
+# returns array with mean times of keystrokes
+def get_median_timing(timings):
+	elements = len(timings)
+	n = len(timings[0])
+	out = np.zeros(n)
+	for data in timings:
+		out += np.array(data)
+	out /= elements
+	return out.tolist()
 
-array1 = [1,10,15,20]
-array2 = [2,12,18,22]
-checkTimings(array1,array2)
+# takes in initial timing data
+# computes covariance matrix and returns it
+def compute_covariance_matrix(timings):
+	n = len(timings)
+	np_temp = np.array(timings)
+	covariance_matrix = np.cov(np_temp.T)
+	return covariance_matrix
+
+
+# testing
+# array1 = [1,10,15,20]
+# timings = [[2,11,14,21],[2,11,15,21],[2,12,14,21]]
+# S = compute_covariance_matrix(timings)
+# array2 = get_median_timing(timings)
+# checkTimings(array1,array2,S)
