@@ -6,6 +6,7 @@ from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
 from models import *
 from rhythmCheck import *
+import os, hashlib, pbkdf2, random, base64
 
 app = Flask(__name__, static_url_path='')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -45,13 +46,19 @@ def checkLogin(username, password):
     user = User.query.filter_by(username=username).first() 
     if user is None:
         return False
-    return user.password == password
+    salt = user.salt
+    cryptPass = unicode(pbkdf2.PBKDF2(password, salt).hexread(32))  
+    return user.password == cryptPass
 
 def registerUser(username, password, timings):
-    if User.query.filter_by(username=username).first() is not None:
+    if User.query.filter_by(username=username).first():
         return False
-    x = User(username, password, timings)
-    db.session.add(x)
+    u = User()
+    u.username = username
+    u.salt = base64.urlsafe_b64encode(os.urandom(128))
+    u.password = unicode(pbkdf2.PBKDF2(password, salt).hexread(32)) 
+    u.timings = timings
+    db.session.add(u)
     db.session.commit()
     return True
 
