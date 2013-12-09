@@ -10,8 +10,10 @@ def checkTimings(testTiming, realTiming, S):
 	temp = np.dot(np.dot(np.transpose(np_test - np_real), S),(np_test - np_real))
 	mh_distance = temp ** 0.5
 
-	print mh_distance
-	return True
+	# currently using static threshold, may need to make this dynamic but not sure right now
+	if mh_distance < 5:
+		return True
+	return False
 
 # takes in initial timing data
 # returns array with mean times of keystrokes
