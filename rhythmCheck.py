@@ -1,11 +1,13 @@
 import numpy as np
+# import more_data as data
 
 ####### test vs averaged training vectors mahabolnis distance function ########
 # finds m_distance between testTiming and realTiming(typically vector of averages)
 # uses covariance matrix S in calculation
 # returns boolean if distance is below a certain threshold
 def checkTimings(testTiming, realTiming, S):
-	np_test = np.array(testTiming)
+	# convert ms data to seconds before computing m_distance
+	np_test = np.array(testTiming) 
 	np_real = np.array(realTiming)
 	n = len(testTiming)
 
@@ -15,9 +17,11 @@ def checkTimings(testTiming, realTiming, S):
 
 	# calculate mahabolonis distance
 	mh_distance = np.dot(np.dot(np.transpose(np_test - np_real), S),(np_test - np_real)) ** 0.5
+	print mh_distance
+
 
 	# currently using static threshold, may need to make this dynamic but not sure right now
-	threshold = n * 0.5
+	threshold = n * 2
 	if mh_distance < threshold:
 		return True
 	return False
@@ -26,7 +30,7 @@ def checkTimings(testTiming, realTiming, S):
 # finds k closest m_distances between testTiming and each vector in realTimings
 # uses covariance matrix S in computation of m_distances
 # returns true if all of k closest m_distances is below threshold
-def checkTimings(testTiming, realTimings, S, k):
+def checkTimingsK(testTiming, realTimings, S, k):
 	np_test = np.array(testTiming)
 	n = len(testTiming)
 
@@ -45,6 +49,7 @@ def checkTimings(testTiming, realTimings, S, k):
 			k_closest_distances.remove(max(k_closest_distances))
 			k_closest_distances.append(mh_distance)
 
+	print k_closest_distances
 	k_furthest_distance = max(k_closest_distances)
 	threshold = n * 0.5
 	if k_furthest_distance <= threshold:
@@ -66,11 +71,27 @@ def getMedianTiming(timings):
 # takes in initial timing data
 # computes covariance matrix and returns it
 def computeCovarianceMatrix(timings):
-	n = len(timings)
 	np_temp = np.array(timings)
 	covariance_matrix = np.cov(np_temp.T)
 	return covariance_matrix
 
+
+# take in data for key strokes
+# return an array of vectors that contain the down times of the keystrokes
+def textToVectors(data):
+	out_vectors = []
+	for vector in data:
+		out_vector = []
+		offset = len('"down":')
+		marker = vector.find('"down":')
+		while marker != -1:
+			end_marker = vector.find(',',marker+offset)
+			if end_marker == -1:
+				end_marker = vector.find('}', marker+offset)
+			out_vector.append(int(vector[marker+offset:end_marker]))
+			marker = vector.find('"down":', end_marker+1)
+		out_vectors.append(out_vector)
+	return out_vectors
 
 # testing
 # array1 = [1,10,15,20]
@@ -78,3 +99,13 @@ def computeCovarianceMatrix(timings):
 # S = compute_covariance_matrix(timings)
 # array2 = get_median_timing(timings)
 # checkTimings(array1,array2,S)
+# tuan_data = textToVectors(data.tuan)[12:]
+# print tuan_data
+# tuan_mean = getMedianTiming(tuan_data)
+# tuan_S = computeCovarianceMatrix(tuan_data)
+# print tuan_mean
+# print tuan_S
+# print checkTimings(tuan_data[0],tuan_mean,tuan_S)
+# print checkTimingsK(tuan_data[0],tuan_data,tuan_S,3)
+
+
