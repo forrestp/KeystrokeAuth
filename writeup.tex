@@ -32,13 +32,48 @@
 \maketitle
 
 \abstract{
-KeystrokeAuth is an example implementation of using keystroke timing as a method of authenticating users.
-It is a primary example of passive biometric authentication. 
-Traditional biometric authentication such as fingerprint or retinal scanners require external hardware and are not suited for web service authentication where users may login from a variety of machines. 
-Keystroke timing can be gathered during the standard login password, requiring no additional hardware and 
 }
 
+\section{Introduction}
+\label{introduction}
+KeystrokeAuth is an example website implementation that uses keystroke timing to provide stronger user authentication.
+Measuring keystroke timing is a method for passive biometric authentication. 
+Traditional biometric authentication such as fingerprint or retinal scanners require external hardware and is not suited for web service authentication where users may login from a variety of machines. 
+Keystroke timing can be gathered using javascript embedded in the login and registration pages.
+Thus this method requires no additional hardware.
+The user must enter her password several times during registration instead of just once or twice, but other than that this method is completely unobstrusive.
+Authenticating passwords with keystroke timing makes it more difficult for an attacker who possesses a user's plaintext password to compromise the account.
+Additionally, it discourages account sharing which may be useful for highly secure systems and premium acconts.
+In this paper we describe past work on the topic, introduce our example implementation called KeystrokeAuth, analyze the added security of our system, and examine a small set of test data.
 
+\section{Background and Related Work}
+TODO: forrest / carlo / kenny / ameesh
+
+
+\section{KeystrokeAuth Implementation}
+KeystrokeAuth uses javascript to capture the timestamps on each keydown and keyup event while typing the password.
+During registration, the user enters her password 10 times.
+The data is sent to the server and KeystrokeAuth computes a model specific to that user and password.
+When logging in, the user enters the password once and KeystrokeAuth compares the new timing data to the registered model.
+If the timing data differs by too much, the user will not be logged in.
+
+\subsection{Gathering Timing Data}
+TODO: forrest
+
+\subsection{Generating User Timing Model}
+TODO: ameesh / kenny
+
+\subsection{Login Timing Authentication}
+TODO: ameesh / kenny
+
+\section{Security Analysis}
+TODO: forrest
+
+\section{Data Collection and Analysis}
+TODO: carlo
+
+\section{Conclusion}
+TODO: forrest / carlo / kenny / ameesh
 
 
 \begin{thebibliography}{99}
@@ -50,18 +85,12 @@ Keystroke timing can be gathered during the standard login password, requiring n
    IEEE, 2009. 
  
  \bibitem{Cho00}
-    %Nearest-neighbor mahalanobix
+    %Nearest-neighbor mahalanobis
+   Cho, Sungzoon, et al.
    ``Web-based keystroke dynamics identity verification using neural network.'' 
    \textit{Journal of organizational computing and electronic commerce}
    10.4 (2000): 295-307.
   
- \bibitem{test}
-    Forrest Pieper,
-    Some paper.
-    Publisher
-    Edition
-    date
-
 \end{thebibliography}
 
 \end {document}
