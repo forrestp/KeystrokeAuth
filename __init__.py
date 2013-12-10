@@ -14,8 +14,12 @@ db.init_app(app)
 admin=Admin(app)
 admin.add_view(ModelView(User, db.session))
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def index():
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -34,10 +38,12 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        print "register: request.method is POST"
         username = request.form.get('username')
         password = request.form.get('password')
         timings = json.loads(request.form.get('timings'))
         success = registerUser(username, password, parseTimings(timings))
+        print "registered user"
         return render_template('register.html', success=success)
     else:
         return render_template('register.html')
