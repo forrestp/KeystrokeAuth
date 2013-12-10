@@ -66,11 +66,6 @@ function pwKeyUp(evt) {
     }
 }
 
-function updateRegdata() {
-    regdata += keystrokes;
-    reset();
-}
-
 function loginSubmit() {
     var json = JSON.stringify(keystrokes);
     document.getElementById("keystrokes").value = json;
