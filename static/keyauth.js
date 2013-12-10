@@ -1,4 +1,7 @@
 var keystrokes = new Array();
+var pwd = "";
+var regdata = new Array();
+var regcount = 0;
 var offset = 0;
 var pwfield;
 var validKeyCodeRanges = [  //ranges are inclusive, based on http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
@@ -63,9 +66,52 @@ function pwKeyUp(evt) {
     }
 }
 
+function updateRegdata() {
+    regdata += keystrokes;
+    reset();
+}
 
-function formSubmit() {
+function loginSubmit() {
     var json = JSON.stringify(keystrokes);
     document.getElementById("keystrokes").value = json;
+    document.getElementById("output").innerHTML += json;
     return true;
+}
+
+function registerReset() {
+    regcount = 0;
+    document.getElementById("count").innerHTML = regcount;
+}
+
+function registerSubmit() {
+    if (regcount == 0) {
+        pwd = document.getElementById("password").value;       
+    }
+    if (regcount == 1) {
+        if (document.getElementById("password").value != pwd) {
+            registerReset();
+            alert("Password changed. Start over");
+        }
+    }
+    if (regcount < 10) {
+        if (document.getElementById("password").value == pwd) {
+            regcount += 1;
+            document.getElementById("count").innerHTML = regcount;
+            regdata += JSON.stringify(keystrokes) + "\n\n";
+            reset();
+            return false;
+            
+        }
+        else {
+            reset();
+            return false;
+        }
+    }
+    if (regcount == 10) {
+       var json = (regdata);
+       document.getElementById("keystrokes").value = json;
+       document.getElementById("output").innerHTML += json;
+       return false; 
+    }
+    
 }

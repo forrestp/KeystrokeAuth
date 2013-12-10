@@ -5,10 +5,10 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <h1>KeystrokeAuth Register Demo</h1>
 
-<form method="post" action="/register" onsubmit="return formSubmit()">
+<form method="post" action="/register" onsubmit="return registerSubmit()">
     Username: <input type="text" name="username" id="username"><br>
     Password: <input type="password" name="password" id="password" 
-        onkeydown="pwKeyDown()" onkeyup="pwKeyUp()" onfocus="pwFocus()"><br>
+        onkeydown="pwKeyDown()" onkeyup="pwKeyUp()" onfocus="pwFocus()"> Progress: <strong id="count">0</strong> out of 10<br>
     <input type="hidden" name="timings" id="keystrokes">
     <input type="submit" value="Submit">
 </form>
