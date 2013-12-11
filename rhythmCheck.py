@@ -5,7 +5,7 @@ import numpy as np
 # finds m_distance between testTiming and realTiming(typically vector of averages)
 # uses covariance matrix S in calculation
 # returns boolean if distance is below a certain threshold
-def checkTimings(testTiming, realTiming, S):
+def checkTimings(testTiming, realTiming, S, threshold=None):
 	# convert ms data to seconds before computing m_distance
 	np_test = .01 * np.array(testTiming) 
 	np_real = .01 * np.array(realTiming)
@@ -20,7 +20,8 @@ def checkTimings(testTiming, realTiming, S):
 	print "MH_Distance: " + str(mh_distance)
 
 	# currently using static threshold, may need to make this dynamic but not sure right now
-	threshold = (n**1.7)*.1
+	if (threshold == None):
+		threshold = (n**1.7)*.1
 	if mh_distance < threshold:
 		return True
 	return False
@@ -29,7 +30,7 @@ def checkTimings(testTiming, realTiming, S):
 # finds k closest m_distances between testTiming and each vector in realTimings
 # uses covariance matrix S in computation of m_distances
 # returns true if all of k closest m_distances is below threshold
-def checkTimingsK(testTiming, realTimings, S, k):
+def checkTimingsK(testTiming, realTimings, S, k, threshold=None):
 	np_test = .01 * np.array(testTiming)
 	n = len(testTiming)
 
@@ -49,7 +50,8 @@ def checkTimingsK(testTiming, realTimings, S, k):
 
 	print "K closest Distance: " + str(k_closest_distances)
 	k_furthest_distance = max(k_closest_distances)
-	threshold = (n**1.7)*0.1
+	if (threshold == None):
+		threshold = (n**1.7)*0.1
 	if k_furthest_distance < threshold:
 		return True
 	return False
