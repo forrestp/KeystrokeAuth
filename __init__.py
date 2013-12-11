@@ -28,20 +28,42 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        testTimings = parseTimings(json.loads(request.form.get('timings')))
+        testTimings = []
+        testTimings.append(down(json.loads(request.form.get('timings'))))
+        #testTimings.append(dwell(json.loads(request.form.get('timings'))))
+        #testTimings.append(flight(json.loads(request.form.get('timings'))))
+        #testTimings.append(down_down(json.loads(request.form.get('timings'))))
         loginSuccess = False
-        timingSuccessK = False
-        timingSuccessMean = False
+        timingSuccessK    = [False, False, False, False]
+        timingSuccessMean = [False, False, False, False]
         if checkLogin(username, password):
             loginSuccess = True
             realTimings = User.query.filter_by(username=username).first().timings
-            realTimings = parseTimings2D(json.loads(realTimings))
-            cov_matrix = computeCovarianceMatrix(realTimings)
-            meanTimings = getMedianTiming(realTimings)
+            realTimingsData = []
+            realTimingsData.append(down(json.loads(realTimings)))
+            #realTimingsData.append(dwell(json.loads(realTimings)))
+            #realTimingsData.append(flight(json.loads(realTimings)))
+            #realTimingsData.append(down_down(json.loads(realTimings)))
+            cov_matrix = []
+            cov_matrix.append(computeCovarianceMatrix(realTimingsData[0]))
+            #cov_matrix.append(computeCovarianceMatrix(realTimingsData[1]))
+            #cov_matrix.append(computeCovarianceMatrix(realTimingsData[2]))
+            #cov_matrix.append(computeCovarianceMatrix(realTimingsData[3]))
+            meanTimings = []
+            meanTimings.append(getMedianTiming(realTimingsData[0]))
+            #meanTimings.append(getMedianTiming(realTimingsData[1]))
+            #meanTimings.append(getMedianTiming(realTimingsData[2]))
+            #meanTimings.append(getMedianTiming(realTimingsData[3]))
             # print meanTimings
             # print testTimings
-            timingSuccessK = checkTimingsK(testTimings, realTimings, cov_matrix, 3)
-            timingSuccessMean = checkTimings(testTimings, meanTimings, cov_matrix)
+            timingSuccessK[0] = checkTimingsK(testTimings[0], realTimingsData[0], cov_matrix[0], 3)
+            #timingSuccessK[1] = checkTimingsK(testTimings[1], realTimingsData[1], cov_matrix[1], 3, 41)
+            #timingSuccessK[2] = checkTimingsK(testTimings[2], realTimingsData[2], cov_matrix[2], 3, 9)
+            #timingSuccessK[3] = checkTimingsK(testTimings[3], realTimingsData[3], cov_matrix[3], 3, 24.5)
+            timingSuccessMean[0] = checkTimings(testTimings[0], meanTimings[0], cov_matrix[0])
+            #timingSuccessMean[1] = checkTimings(testTimings[1], meanTimings[1], cov_matrix[1], 42.5)
+            #timingSuccessMean[2] = checkTimings(testTimings[2], meanTimings[2], cov_matrix[2], 9)
+            #timingSuccessMean[3] = checkTimings(testTimings[3], meanTimings[3], cov_matrix[3], 25.0)
         return render_template('login.html', output=testTimings, 
                 loginSuccess=loginSuccess, timingSuccessMean=timingSuccessMean, timingSuccessK=timingSuccessK)
     else:
@@ -80,19 +102,31 @@ def registerUser(username, password, timings):
     db.session.commit()
     return True
 
-''' Just work with down timings for now '''
-def parseTimings(timings):
-    return [t['down'] for t in timings]
+''' The various four features/metrics we use for comparison.'''
+def down(data):
+  if (isinstance(data[0], list)):
+    return map(down, data)
+  else:
+    return [d.get('down',0) for d in data]
 
-def parseTimings2D(timings):
-    out = []
-    for row in timings:
-        temp = []
-        for stroke in row:
-            temp.append(stroke['down'])
+def dwell(data):
+  if (isinstance(data[0], list)):
+    return map(dwell, data)
+  else:
+    return [d.get('up',0) - d.get('down',0) for d in data]
 
-        out.append(temp)
-    return out
+def flight(data):
+  if (isinstance(data[0], list)):
+    return map(flight, data)
+  else:
+    return [data[i+1].get('down',0) - data[i].get('up',0) for i in range(len(data)-1)]
+
+def down_down(data):
+  if (isinstance(data[0], list)):
+    return map(down_down, data)
+  else:
+    return [data[i+1].get('down',0) - data[i].get('down',0) for i in range(len(data)-1)]
+
 
 if __name__ == '__main__':
     app.debug=True
