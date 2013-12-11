@@ -98,25 +98,21 @@ function registerSubmit() {
             alert("Password changed. Start over");
         }
     }
-    if (regcount < 10) {
-        if (document.getElementById("password").value == pwd) {
-            regcount += 1;
-            document.getElementById("count").innerHTML = regcount;
-            regdata.push(keystrokes);
-            reset();
-            return false;
-            
+    if (document.getElementById("password").value == pwd) {
+        regcount += 1;
+        document.getElementById("count").innerHTML = regcount;
+        regdata.push(keystrokes);
+        if (regcount == 10) {
+            var json = JSON.stringify(regdata);
+            document.getElementById("keystrokes").value = json;
+            document.getElementById("output").innerHTML += json;
+            return true; 
         }
-        else {
-            reset();
-            return false;
-        }
+        reset();
+        return false;
     }
-    if (regcount == 10) {
-       var json = JSON.stringify(regdata);
-       document.getElementById("keystrokes").value = json;
-       document.getElementById("output").innerHTML += json;
-       return true; 
+    else {
+        reset();
+        return false;
     }
-    
 }
