@@ -92,7 +92,7 @@ function registerSubmit() {
         if (document.getElementById("password").value == pwd) {
             regcount += 1;
             document.getElementById("count").innerHTML = regcount;
-            regdata += JSON.stringify(keystrokes) + "\n\n";
+            regdata.push(keystrokes);
             reset();
             return false;
             
@@ -103,7 +103,7 @@ function registerSubmit() {
         }
     }
     if (regcount == 10) {
-       var json = (regdata);
+       var json = JSON.stringify(regdata);
        document.getElementById("keystrokes").value = json;
        document.getElementById("output").innerHTML += json;
        return false; 
