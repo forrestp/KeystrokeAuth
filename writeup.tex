@@ -49,6 +49,15 @@ In this paper we describe past work on the topic, introduce our example implemen
 \section{Background and Related Work}
 TODO: forrest / carlo / kenny / ameesh
 
+describe various features
+\begin{enumerate}[-]
+  \item flight:
+  \item dwell:
+  \item down-down:
+  \item up-up:
+\end{enumerate}
+
+describe various detectors
 
 \section{KeystrokeAuth Implementation}
 KeystrokeAuth uses javascript to capture the timestamps on each keydown and keyup event while typing the password.
@@ -60,17 +69,37 @@ If the timing data differs by too much, the user will not be logged in.
 \subsection{Gathering Timing Data}
 TODO: forrest
 
+Gather code, uptime, downtime --> compute various features
+
 \subsection{Generating User Timing Model}
-TODO: ameesh / kenny
+TODO: ameesh / kenny  ***make this part feature-agnostic
 
 \subsection{Login Timing Authentication}
-TODO: ameesh / kenny
+TODO: ameesh / kenny  ***make this part feature-agnostic 
 
 \section{Security Analysis}
 TODO: forrest
 
+proof that security is not worse
+
+strategy: make it no less convinient/difficult for users, and at least slightly more secure
+
 \section{Data Collection and Analysis}
 TODO: carlo
+
+\subsection{Data Overview}
+% how you gathered data
+% graphs demonstrating biometric uniqueness
+
+\subsection{Feature Comparison} %dwell vs flight vs down-down etc.
+%table of which features they pass both detectors 
+
+
+\subsection{Error Rates}    %false positive (someone else logs in) and false negative (I can't log in)
+
+Goal: Find ideal thresholds and weights for each feature that give 1\% false negative rate
+ideal would be  .001\% false positive, but anything less than 100\% is an improvement over state of the art
+Compromise: increase false positive rate to accomodate 1\% false negative
 
 \section{Conclusion}
 TODO: forrest / carlo / kenny / ameesh

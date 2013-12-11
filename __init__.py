@@ -93,11 +93,9 @@ def checkLogin(username, password):
 def registerUser(username, password, timings):
     if User.query.filter_by(username=username).first():
         return False
-    username = username
     salt = base64.urlsafe_b64encode(os.urandom(128))
-    password = unicode(pbkdf2.PBKDF2(password, salt).hexread(32)) 
-    timings = timings
-    u = User(username, password, salt, timings)
+    password_hash = unicode(pbkdf2.PBKDF2(password, salt).hexread(32)) 
+    u = User(username, password_hash, salt, timings)
     db.session.add(u)
     db.session.commit()
     return True
