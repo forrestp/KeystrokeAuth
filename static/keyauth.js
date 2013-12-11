@@ -12,6 +12,16 @@ var validKeyCodeRanges = [  //ranges are inclusive, based on http://www.cambiare
     [219, 222] //more special characters
 ];
 
+function show_pwd(){
+    visible_field = document.getElementById("pwd_visible")
+    pwd_field = document.getElementById("password");
+    if (visible_field.checked) {
+        pwd_field.type = "text";
+    } else {
+        pwd_field.type = "password";
+    }
+}
+
 function checkKeyCode(code){
     for (i=0; i<validKeyCodeRanges.length; i++) {
         if ((code >= validKeyCodeRanges[i][0]) && (code <= validKeyCodeRanges[i][1])) {

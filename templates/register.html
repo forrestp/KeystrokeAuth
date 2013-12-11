@@ -4,6 +4,9 @@
 <script src="/keyauth.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <h1>KeystrokeAuth Register Demo</h1>
+<form>
+    Show Password: <input type="checkbox" id="pwd_visible" onclick="show_pwd()"
+</form>
 
 <form method="post" action="/register" onsubmit="return registerSubmit()">
     Username: <input type="text" name="username" id="username"><br>
