@@ -23,11 +23,35 @@
 loginSuccess: {{loginSuccess}}
 {% endif%}
 <br>
-{% if timingSuccessMean is defined %}
-timingSuccessMean: {{timingSuccessMean}}
-{% endif%}
-<br>
-{% if timingSuccessK is defined %}
-timingSuccessK: {{timingSuccessK}}
-{% endif%}
+<table border="3">
+    <th>
+        <td><b>Feature:</b> </td>    
+        <td>down</td>
+        <td>dwell</td>
+        <td>flight</td>
+        <td>down_down</td>
+    </th>
+
+    <tr>
+        <td><b>Detector:</b> </td>
+    </tr>
+    <tr>
+        {% if timingSuccessMean is defined %}
+            <td>timingSuccessMean</td>
+            <td style="visibility: hidden;"></td>
+            {% for x in timingSuccessMean%}
+                <td>{{x}}</td>
+            {% endfor %}
+        {% endif%}
+</tr>
+<tr>
+        {% if timingSuccessK is defined %}
+            <td>timingSuccessK</td>
+            <td style="visibility: hidden;"></td>     
+            {% for x in timingSuccessK %}
+                <td> {{x}}</td>
+            {% endfor %}
+        {% endif %}
+</tr>
+</table>
 </html>
