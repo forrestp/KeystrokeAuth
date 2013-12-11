@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
 
 from flask import Flask, render_template, request, json
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -16,6 +16,8 @@ admin.add_view(ModelView(User, db.session))
 if not os.path.isfile("test.db"):
     with app.app_context():
         db.create_all()
+
+
 
 @app.route('/', methods=['GET'])
 def index():
@@ -44,8 +46,8 @@ def register():
         print "register: request.method is POST"
         username = request.form.get('username')
         password = request.form.get('password')
-        timings = json.loads(request.form.get('timings'))
-        success = registerUser(username, password, parseTimings(timings))
+        timings = request.form.get('timings')
+        success = registerUser(username, password, timings)
         print "registered user"
         return render_template('register.html', success=success)
     else:
