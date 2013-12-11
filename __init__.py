@@ -1,4 +1,4 @@
-#!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
+#!/usr/bin/python
 
 from flask import Flask, render_template, request, json
 from flask.ext.sqlalchemy import SQLAlchemy
