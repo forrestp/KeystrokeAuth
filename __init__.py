@@ -6,7 +6,10 @@ from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
 from models import *
 from rhythmCheck import *
-import os, hashlib, pbkdf2, random, base64
+from Crypto.Cipher import AES
+from Crypto.Protocol.KDF import PBKDF2 
+from Crypto import Random
+import os, hashlib, random, base64
 
 app = Flask(__name__, static_url_path='')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -38,7 +41,7 @@ def login():
         timingSuccessMean = [False, False, False, False]
         if checkLogin(username, password):
             loginSuccess = True
-            realTimings = User.query.filter_by(username=username).first().timings
+            realTimings = getTimings(username,password)
             realTimingsData = []
             realTimingsData.append(down(json.loads(realTimings)))
             #realTimingsData.append(dwell(json.loads(realTimings)))
@@ -87,18 +90,35 @@ def checkLogin(username, password):
     if user is None:
         return False
     salt = user.salt
-    cryptPass = unicode(pbkdf2.PBKDF2(password, salt).hexread(32))  
-    return user.password == cryptPass
+    cryptPass = PBKDF2(password, salt, 32, 1000)
+    return base64.b64decode(user.password) == cryptPass
 
 def registerUser(username, password, timings):
     if User.query.filter_by(username=username).first():
         return False
-    salt = base64.urlsafe_b64encode(os.urandom(128))
-    password_hash = unicode(pbkdf2.PBKDF2(password, salt).hexread(32)) 
-    u = User(username, password_hash, salt, timings)
+    salt = base64.b64encode(Random.new().read(32))
+    password_hash = PBKDF2(password, salt, 32, 1000)
+
+    salt2 = base64.b64encode(Random.new().read(32))
+    iv = Random.new().read(AES.block_size)
+    aes_hash = PBKDF2(password, salt2, 32, 1000)
+    aes = AES.new(aes_hash, AES.MODE_CFB, iv)
+    encrypted_timings = base64.b64encode(iv + aes.encrypt(timings))
+
+    u = User(username, base64.b64encode(password_hash), salt, salt2, encrypted_timings)
     db.session.add(u)
     db.session.commit()
     return True
+
+def getTimings(username, password):
+    if checkLogin(username, password):
+        user = User.query.filter_by(username=username).first() 
+        aes_hash = PBKDF2(password, user.salt2, 32, 1000)
+        encrypted_timings = base64.b64decode(user.timings)
+        iv = encrypted_timings[:16]
+        aes = AES.new(aes_hash, AES.MODE_CFB, iv)
+        return aes.decrypt(encrypted_timings[16:])
+    return ""
 
 ''' The various four features/metrics we use for comparison.'''
 def down(data):
