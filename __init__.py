@@ -30,6 +30,7 @@ def login():
         password = request.form.get('password')
         testTimings = parseTimings(json.loads(request.form.get('timings')))
         loginSuccess = False
+        timingSuccessK = False
         timingSuccessMean = False
         if checkLogin(username, password):
             loginSuccess = True
@@ -37,12 +38,12 @@ def login():
             realTimings = parseTimings2D(json.loads(realTimings))
             cov_matrix = computeCovarianceMatrix(realTimings)
             meanTimings = getMedianTiming(realTimings)
-            print meanTimings
-            print testTimings
-            #timingSuccessK = checkTimingsK(testTimings, meanTimings, cov_matrix, 3)
+            # print meanTimings
+            # print testTimings
+            timingSuccessK = checkTimingsK(testTimings, realTimings, cov_matrix, 3)
             timingSuccessMean = checkTimings(testTimings, meanTimings, cov_matrix)
         return render_template('login.html', output=testTimings, 
-                loginSuccess=loginSuccess, timingSuccess=timingSuccessMean)
+                loginSuccess=loginSuccess, timingSuccessMean=timingSuccessMean, timingSuccessK=timingSuccessK)
     else:
         return render_template('login.html')
  
