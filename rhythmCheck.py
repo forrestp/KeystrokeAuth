@@ -21,7 +21,7 @@ def checkTimings(testTiming, realTiming, S):
 
 
 	# currently using static threshold, may need to make this dynamic but not sure right now
-	threshold = n * .1
+	threshold = (n**1.7)*.1
 	if mh_distance < threshold:
 		return True
 	return False

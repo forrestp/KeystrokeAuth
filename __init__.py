@@ -30,7 +30,7 @@ def login():
         password = request.form.get('password')
         testTimings = parseTimings(json.loads(request.form.get('timings')))
         loginSuccess = False
-        timingSuccess = False
+        timingSuccessMean = False
         if checkLogin(username, password):
             loginSuccess = True
             realTimings = User.query.filter_by(username=username).first().timings
