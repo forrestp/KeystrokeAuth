@@ -7,8 +7,8 @@ import numpy as np
 # returns boolean if distance is below a certain threshold
 def checkTimings(testTiming, realTiming, S):
 	# convert ms data to seconds before computing m_distance
-	np_test = np.array(testTiming) 
-	np_real = np.array(realTiming)
+	np_test = .01 * np.array(testTiming) 
+	np_real = .01 * np.array(realTiming)
 	n = len(testTiming)
 
 	# check if S has inverse
@@ -17,11 +17,11 @@ def checkTimings(testTiming, realTiming, S):
 
 	# calculate mahabolonis distance
 	mh_distance = np.dot(np.dot(np.transpose(np_test - np_real), S),(np_test - np_real)) ** 0.5
-	print mh_distance
+	print "MH_Distance: " + str(mh_distance)
 
 
 	# currently using static threshold, may need to make this dynamic but not sure right now
-	threshold = n * 2
+	threshold = n * .1
 	if mh_distance < threshold:
 		return True
 	return False
@@ -71,7 +71,7 @@ def getMedianTiming(timings):
 # takes in initial timing data
 # computes covariance matrix and returns it
 def computeCovarianceMatrix(timings):
-	np_temp = np.array(timings)
+	np_temp = .01 * np.array(timings)
 	covariance_matrix = np.cov(np_temp.T)
 	return covariance_matrix
 

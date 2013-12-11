@@ -28,15 +28,21 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        testTimings = json.loads(request.form.get('timings'))
+        testTimings = parseTimings(json.loads(request.form.get('timings')))
         loginSuccess = False
         timingSuccess = False
         if checkLogin(username, password):
             loginSuccess = True
             realTimings = User.query.filter_by(username=username).first().timings
-            timingSuccess = checkTimings(parseTimings(testTimings), realTimings)
+            realTimings = parseTimings2D(json.loads(realTimings))
+            cov_matrix = computeCovarianceMatrix(realTimings)
+            meanTimings = getMedianTiming(realTimings)
+            print meanTimings
+            print testTimings
+            #timingSuccessK = checkTimingsK(testTimings, meanTimings, cov_matrix, 3)
+            timingSuccessMean = checkTimings(testTimings, meanTimings, cov_matrix)
         return render_template('login.html', output=testTimings, 
-                loginSuccess=loginSuccess, timingSuccess=timingSuccess)
+                loginSuccess=loginSuccess, timingSuccess=timingSuccessMean)
     else:
         return render_template('login.html')
  
@@ -76,6 +82,16 @@ def registerUser(username, password, timings):
 ''' Just work with down timings for now '''
 def parseTimings(timings):
     return [t['down'] for t in timings]
+
+def parseTimings2D(timings):
+    out = []
+    for row in timings:
+        temp = []
+        for stroke in row:
+            temp.append(stroke['down'])
+
+        out.append(temp)
+    return out
 
 if __name__ == '__main__':
     app.debug=True
