@@ -13,6 +13,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db.init_app(app)
 admin=Admin(app)
 admin.add_view(ModelView(User, db.session))
+if not os.path.isfile("test.db"):
+    with app.app_context():
+        db.create_all()
 
 @app.route('/', methods=['GET'])
 def index():

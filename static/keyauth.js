@@ -106,7 +106,7 @@ function registerSubmit() {
        var json = JSON.stringify(regdata);
        document.getElementById("keystrokes").value = json;
        document.getElementById("output").innerHTML += json;
-       return false; 
+       return true; 
     }
     
 }
