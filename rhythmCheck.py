@@ -19,7 +19,6 @@ def checkTimings(testTiming, realTiming, S):
 	mh_distance = np.dot(np.dot(np.transpose(np_test - np_real), S),(np_test - np_real)) ** 0.5
 	print "MH_Distance: " + str(mh_distance)
 
-
 	# currently using static threshold, may need to make this dynamic but not sure right now
 	threshold = (n**1.7)*.1
 	if mh_distance < threshold:
@@ -31,7 +30,7 @@ def checkTimings(testTiming, realTiming, S):
 # uses covariance matrix S in computation of m_distances
 # returns true if all of k closest m_distances is below threshold
 def checkTimingsK(testTiming, realTimings, S, k):
-	np_test = np.array(testTiming)
+	np_test = .01 * np.array(testTiming)
 	n = len(testTiming)
 
 	# check if S has inverse
@@ -39,20 +38,19 @@ def checkTimingsK(testTiming, realTimings, S, k):
 		S = np.linalg.inv(S)
 
 	# Find k closest vectors in training data
-	k_closest_distances = []
+	k_closest_distances = [100000] * k
 	for vector in realTimings:
-		np_vector = np.array(vector)
-		mh_distance = np.dot(np.dot(np.transpose(np_test - vector), S),(np_test - vector)) ** 0.5
-		if len(k_closest_distances) < k:
-			k_closest_distances.append(mh_distance)
-		elif max(k_closest_distances) > mh_distance:
+		np_vector = .01 * np.array(vector)
+		mh_distance = np.dot(np.dot(np.transpose(np_test - np_vector), S),(np_test - np_vector)) ** 0.5
+		print "MH_Distance: " + str(mh_distance)
+		if max(k_closest_distances) > mh_distance:
 			k_closest_distances.remove(max(k_closest_distances))
 			k_closest_distances.append(mh_distance)
 
-	print k_closest_distances
+	print "K closest Distance: " + str(k_closest_distances)
 	k_furthest_distance = max(k_closest_distances)
-	threshold = n * 0.5
-	if k_furthest_distance <= threshold:
+	threshold = (n**1.7)*0.1
+	if k_furthest_distance < threshold:
 		return True
 	return False
 
