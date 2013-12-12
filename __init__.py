@@ -25,40 +25,29 @@ if not os.path.isfile("test.db"):
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
+from features import *
+features = [(dwell, 1), (down, 1), (flight, 1), (down_down, 1)]
+detectors = [(checkTimings, 1), (checkTimingsK, 1)]
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        results = []
         username = request.form.get('username')
         password = request.form.get('password')
         testTimings = []
-        testTimings.append(down(json.loads(request.form.get('timings'))))
-        testTimings.append(dwell(json.loads(request.form.get('timings'))))
-        testTimings.append(flight(json.loads(request.form.get('timings'))))
-        testTimings.append(down_down(json.loads(request.form.get('timings'))))
+        for x in features:
+            testTimings.append(x[0](json.loads(request.form.get('timings'))))
         loginSuccess = False
-        timingSuccessK    = [False, False, False, False]
-        timingSuccessMean = [False, False, False, False]
+        for x in detectors:
+            results.append([False]*len(features))
         if checkLogin(username, password):
             loginSuccess = True
             realTimings = getTimings(username,password)
-            realTimingsData = []
-            realTimingsData.append(down(json.loads(realTimings)))
-            realTimingsData.append(dwell(json.loads(realTimings)))
-            realTimingsData.append(flight(json.loads(realTimings)))
-            realTimingsData.append(down_down(json.loads(realTimings)))
-            cov_matrix = []
-            cov_matrix.append(computeCovarianceMatrix(realTimingsData[0]))
-            cov_matrix.append(computeCovarianceMatrix(realTimingsData[1]))
-            cov_matrix.append(computeCovarianceMatrix(realTimingsData[2]))
-            cov_matrix.append(computeCovarianceMatrix(realTimingsData[3]))
-            meanTimings = []
-            meanTimings.append(getMedianTiming(realTimingsData[0]))
-            meanTimings.append(getMedianTiming(realTimingsData[1]))
-            meanTimings.append(getMedianTiming(realTimingsData[2]))
-            meanTimings.append(getMedianTiming(realTimingsData[3]))
-            # print meanTimings
-            # print testTimings
+            realTimingsData = [x[0](json.loads(realTimings)) for x in features]
+            cov_matrix = [computeCovarianceMatrix(x) for x in realTimingsData]
+            meanTimings = [getMedianTiming(x) for x in readTimingsData]
+#            [y[0](*x, ) for x in zip(testTimings, realTimingsData, cov_matrix) for y in detectors]
             timingSuccessK[0] = checkTimingsK(testTimings[0], realTimingsData[0], cov_matrix[0], 3)
             timingSuccessK[1] = checkTimingsK(testTimings[1], realTimingsData[1], cov_matrix[1], 3, 41)
             timingSuccessK[2] = checkTimingsK(testTimings[2], realTimingsData[2], cov_matrix[2], 3, 9)
@@ -119,32 +108,6 @@ def getTimings(username, password):
         aes = AES.new(aes_hash, AES.MODE_CFB, iv)
         return aes.decrypt(encrypted_timings[16:])
     return ""
-
-''' The various four features/metrics we use for comparison.'''
-def down(data):
-  if (isinstance(data[0], list)):
-    return map(down, data)
-  else:
-    return [d.get('down',0) for d in data]
-
-def dwell(data):
-  if (isinstance(data[0], list)):
-    return map(dwell, data)
-  else:
-    return [d.get('up',0) - d.get('down',0) for d in data]
-
-def flight(data):
-  if (isinstance(data[0], list)):
-    return map(flight, data)
-  else:
-    return [data[i+1].get('down',0) - data[i].get('up',0) for i in range(len(data)-1)]
-
-def down_down(data):
-  if (isinstance(data[0], list)):
-    return map(down_down, data)
-  else:
-    return [data[i+1].get('down',0) - data[i].get('down',0) for i in range(len(data)-1)]
-
 
 if __name__ == '__main__':
     app.debug=True

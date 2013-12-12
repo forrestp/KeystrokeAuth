@@ -1,0 +1,11 @@
+Our project is KeystrokeAuth is a passive biometric authentication system that uses keystroke timings to strengthen the standard password strategy for authenticating users of web-based services.
+
+KeystrokeAuth augments traditional authentication by using javascript to gather keyup and keydown timestamps for each keystroke during password entry. During registration, the user enters the password several times to create a personalized keystroke timing model. During login, the password timing data is compared to the stored model to detect whether or not the actual user entered the password.
+
+Our system is not accurate enough for users to intentionally make their password public, but makes it more difficult for an attacker who knows a user's plaintext password to access that user's account. This helps protect against over-the-shoulder attacks and simple keyloggers, as well as discouraging users from sharing accounts (which is useful for paid web services). We do not sacrifice any security features of traditional password authentication and the timing models are stored securely in the database. 
+
+###   SKIP   ###
+We carefully encrypt each user's timing model to avoid giving an adversary information about the password should the database be compromised. An attacker with access to the database would still need the plaintext password to decrypt the timing model in order to learn any useful information.
+###   SKIT   ###
+
+We are studying two detector algorithms on four feature sets of the timing data. As we gather more data we will weight each detector/feature combination to increase accuracy and reliability. Now we will present some preliminary data followed by a demo of KeystrokeAuth. 
