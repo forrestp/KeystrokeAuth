@@ -43,7 +43,7 @@ Measuring keystroke timing is a method for passive biometric authentication.
 Traditional biometric authentication such as fingerprint or retinal scanners require external hardware and is not suited for web service authentication where users may login from a variety of machines. 
 Keystroke timing can be gathered using Javascript embedded in the login and registration pages.
 Thus this method requires no additional hardware.
-The user must enter her password several times during registration instead of just once or twice, but otherwise the method is largely unobstrusive.
+The user must enter her password several times during registration instead of just once or twice, but otherwise the method is largely unobtrusive.
 Authenticating passwords with keystroke timing makes it more difficult for an attacker who possesses a user's plaintext password to compromise the account.
 Additionally, it discourages account sharing which may be useful for highly secure systems and premium accounts.
 In this paper we describe past work on the topic, introduce our example implementation, analyze the added security of our system, and examine a small set of test data.
@@ -65,10 +65,10 @@ If the timing data differs too much, the user will not be logged in.
 Timing data is gathered with Javascript event handlers on key presses in the registration and login pages.
 Timing data is only gathered when the focus is on the password field. The password field is reset whenever it gains focus (via the onFocus event handler).  
 While gathering timing data, any key that is not a valid password character, e.g. backspace or the arrow keys, causes the entire password field to reset.
-This ensures we only get timing data for a continous entry of password characters.
+This ensures we only get timing data for a continuous entry of password characters.
 
 The timing data for each password entry consists of a list of objects with keycode, keyup, and keydown fields. The keyup and keydown fields are timestamps normalized by subtracting the keydown timestamp for the first character in the password entry. 
-During login, only one password entry is gathered. During registration, a counter keeps track of enteries and won't submit until the password has been entered 10 times.
+During login, only one password entry is gathered. During registration, a counter keeps track of entries and won't submit until the password has been entered 10 times.
 
 Some tables and logs indicating which of the models passed and failed are printed out to the page after submission of the login page. 
 This is useful for debugging purposes, but should be turned off for a real-world implementation.
@@ -81,7 +81,7 @@ In order to have success with verifying users using keystroke dynamics, we first
 	\item[Flight time:] The time in-between a key up and the following key down event. This value can be negative as a key may not be released before the next is pressed down. 
 	\item[Dwell time:] The time that a given key is held down
 \end{description}
-We are able to calculate all of these values from the initial 10 password entries that are passed in during registration. These metrics will be passed to the distance algorithm described below to deterimine if the entry is close enough to permit login.
+We are able to calculate all of these values from the initial 10 password entries that are passed in during registration. These metrics will be passed to the distance algorithm described below to determine if the entry is close enough to permit login.
 
 \subsection{Login Authentication Algorithm}
 We make use of the Mahalanobis distance to compute the similarity between two password timings, represented as vectors.  \\
@@ -97,7 +97,7 @@ The threshold is computed using the training data. We find the Mahalanobis dista
 \section{Security Analysis}
 KeystrokeAuth makes it more difficult for an attacker with knowledge of a user's plaintext password to gain access to the user's account.
 Users should still try to keep their passwords secret.
-Since KeystrokeAuth is intended to augment standard password-based authentication for web services, it must not weaken any of the security featurus of the standard scheme. 
+Since KeystrokeAuth is intended to augment standard password-based authentication for web services, it must not weaken any of the security features of the standard scheme. 
 For it to be useful in practice, the login process must not be much more difficult for actual users.
 At the same time, the login process should be more difficult for an attacker with a user's plaintext password.
 
@@ -110,13 +110,13 @@ The following two terms are useful for describing how KeystrokeAuth meets these 
 
 The threshold described in 3.3 can be adjusted to affect the error rates. 
 Making the threshold smaller increases the false negative rate but decreases the false positive rate, and vice versa.
-In our authentication algorithm, the threshold is set such that the false negative rate is around 30\%. Although this seems high, 90\% of users will login within 2 tries. This is a good tradeoff between security and convenience because our false positive rate is significanlty less than 100\%.
+In our authentication algorithm, the threshold is set such that the false negative rate is around 30\%. Although this seems high, 90\% of users will login within 2 tries. This is a good trade-off between security and convenience because our false positive rate is significantly less than 100\%.
 
 The standard password security strategy allows for the password database to be compromised without revealing the users password.
 KeystrokeAuth was carefully designed not to violate this security feature.
 
 The timing model for each user is encrypted with AES CFB encryption using a salted and hashed (PBKDF2) user password as the key. The salt in this case differs from the salt and hash of the user password that is stored on the server. Thus, for each user, the server stores the username, two different salts, the hashed and salted password, and the encrypted timing data. 
-An attacker with a compromised copy of the database but no plaintext password would not be able to unencrypt this model, preventing him from using the timing information to guess the password.
+An attacker with a compromised copy of the database but not the plaintext password would be unable to decrypt this model, preventing him from using the timing information to guess the password.
 An attacker with the plaintext password but no copy of the database would have no way of determining the user's timing model, so his only option would be to try to log in many times with various typing rhythms. 
 
 An attacker with both the plaintext password and a copy of the database would be able to decrypt the model and use a script to send keypresses at the correct times to compromise the account. 
@@ -131,7 +131,7 @@ Timing data was recorded from twelve participants typing three phrases. In an ef
 
 The phrase \textit{facebookgoogle} was chosen as it is universally familiar to our participants, resulting in very consistent typing rhythms. \textit{phideltatheta} was used because a portion of our participants were familiar with the phrase. The last phrase, \textit{biedenharn}, was chosen as an example of an attack where \textit{biedenharn} was the account password of a user and the participants were trying to compromise the account. Like a password, \textit{biedenharn} was not familiar to any of our participants except for one of the authors of this paper.\\
 
-Even when looking at the messy graph in Figure \ref{full_facebookgoogle_flight}, it is clear that individuals have unique typing rhythms with familar words. Filtering the data down to a few participants in Figure \ref{multi_facebookgoogle_flight} shows this more directly.
+Even when looking at the messy graph in Figure \ref{full_facebookgoogle_flight}, it is clear that individuals have unique typing rhythms with familiar words. Filtering the data down to a few participants in Figure \ref{multi_facebookgoogle_flight} shows this more directly.
 
 \begin{figure}[H]
   \begin{subfigure}[b]{75mm}
@@ -194,7 +194,7 @@ In practice, the different features produce variably unique datasets. Though the
     \caption{flight}
     \label{all_graphs:flight}
   \end{subfigure}
-  \caption{Comparison of the six features. The blue data represents the phrase \textit{biedenharn} typed by somebody familiar with the phrase. The green data represents somebody unfamilar with the phrase.}
+  \caption{Comparison of the six features. The blue data represents the phrase \textit{biedenharn} typed by somebody familiar with the phrase. The green data represents somebody unfamiliar with the phrase.}
   \label{all_graphs}
 \end{figure}
 
