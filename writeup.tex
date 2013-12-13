@@ -52,7 +52,7 @@ In this paper we describe past work on the topic, introduce our example implemen
 
 Many different studies have been done in the past about fingerprinting users based on keystroke cadence, a few of which are referenced below. However, many of these studies focus on running a keylogger in the background of a user session and collecting a large amount of keystrokes before making a decision. The model that these keystrokes are compared to can also be quite large. In contrast, KeystrokeAuth can only compare the timing data from a short password entry to the timing data of a small bank of previously entered passwords. This makes detecting adversaries much more difficult.
 
-In our system, we avoided the legwork of comparing multiple algorithms for what may be the best fit for us. Instead, we chose a few of the top performing algorithms described in {[}1{]} to test in a password context. In particular, the Mahalanobis distance described below performed very well in {[}1{]} and is described in more detail in {[}2{]}. 
+In our system, we avoided the legwork of comparing multiple algorithms for what may be the best fit for us. Instead, we chose a few of the top performing algorithms described in {[}1{]} to test in a password context with a much smaller bank of model password timings (in contrast to 400 in the paper). In particular, the Mahalanobis distance described below performed very well in {[}1{]} and is described in more detail in {[}2{]}. We believe that a bank of 400 passwords is unrealistic for most websites to request of a user. In KeystrokeAuth, we settle on 10 password entries upon registration, which is much more reasonable. 
 
 \section{KeystrokeAuth Implementation}
 KeystrokeAuth uses Javascript to capture the timestamps on each keydown and keyup event while typing the password.
@@ -82,19 +82,23 @@ In order to have success with verifying users using keystroke dynamics, we first
 	\item[Flight time:] The time in-between a key up and the following key down event. This value can be negative as a key may not be released before the next is pressed down. 
 	\item[Dwell time:] The time that a given key is held down
 \end{description}
-We are able to calculate all of these values from the initial 10 password entries that are passed in during registration. The calculated data is then encrypted with AES CFB encryption using a salted and hashed (PBKDF2) user password as the key. The salt in this case differs from the salt and hash of the user password that is stored on the server. Thus, for each user, the server stores the username, two different salts, the hashed and salted password, and the encrypted timing data.
+We are able to calculate all of these values from the initial 10 password entries that are passed in during registration. These metrics will be used when a login attempt is received to determine whether or not to authenticate a given user.
 
-These metrics will be used when a login attempt is received to determine whether or not to authenticate a given user.
-
-\subsection{Login Timing Authentication}
-In order to determine whether or not the user attempting to log in should be authenticated, we collect the down time, the down-down time, the flight time, and the dwell time to compare against the training data. We make use of the mahalanobis distance to compute the similarity between two vectors.  \\
+\subsection{Login Timing Authentication Algorithm}
+In order to determine whether or not the user attempting to log in should be authenticated, we use the timing models described above to compare against the training data. We make use of the mahalanobis distance to compute the similarity between two vectors.  \\
 \begin{displaymath}
 D_m(\vec{x}) = \sqrt{(\vec{x}-\vec{y})^T S^{-1} (\vec{x}-\vec{y})}
 \end{displaymath} \\
-We make use of the mahalanobis distance in both of authentication functions. The first function we use takes the mean of the training data vectors and computes the distance between the login attempt and the computed mean vector. If the distance from the mean vector is below a certain threshold, then the login attempt is accepted. The 2nd function that we employ is we take the login attempt and find its distance from each of the training vectors. If the $k$ closes distances all fall below a threshold, then the login attempt is accepted. \\ \\
-The threshold is computed using the training data. We find the mahalanobis distance between each vector in the training data. We then compute the average distance. The threshold is set to be one deviation away from the mean in the direction of smaller distances. In other words we only accept login attempts where the distance of the attempt is at least one deviation than our computed mean distance. 
+Mahalanobis distance is used in two different authentication functions. The first function takes the mean of the training data vectors and computes the distance between the login attempt and the computed mean vector. If the distance from the mean vector is below a certain threshold the login attempt is accepted. 
+
+The 2nd function that we employ is takes the login attempt and finds its distance from each of the training vectors. If the $k$ closes distances all fall below a threshold the login attempt is accepted. \\ \\
+A threshold is computed using the training data. We find the Mahalanobis distance between each vector in the training data. We then compute the average distance. The threshold is set to be one deviation away from the mean in the direction of smaller distances. In other words we only accept login attempts where the distance of the attempt is within one deviation from our computed mean distance. 
+
 \section{Security Analysis}
 TODO: forrest
+
+The calculated data is then encrypted with AES CFB encryption using a salted and hashed (PBKDF2) user password as the key. The salt in this case differs from the salt and hash of the user password that is stored on the server. Thus, for each user, the server stores the username, two different salts, the hashed and salted password, and the encrypted timing data. This ensures that password timing data can not be retrieved with an attack on the database.
+
 
 proof that security is not worse
 
@@ -112,6 +116,7 @@ TODO: carlo
 
 
 \subsection{Error Rates}    %false positive (someone else logs in) and false negative (I can't log in)
+Statistically we accept values within one standard deviation of the mean, which means we should see a success in 68% of cases.
 
 Goal: Find ideal thresholds and weights for each feature that give 1\% false negative rate
 ideal would be  .001\% false positive, but anything less than 100\% is an improvement over state of the art
@@ -119,7 +124,7 @@ Compromise: increase false positive rate to accomodate 1\% false negative
 
 \section{Conclusion}
 TODO: forrest / carlo / kenny / ameesh
-
+KeystrokeAuth does not intend to be a complete solution to password theft and user authentication. Instead, we implement a client/server keystroke biometric website that can support multiple
 
 \begin{thebibliography}{99}
   \bibitem{Killourhy09}
