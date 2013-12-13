@@ -83,7 +83,7 @@ def computeCovarianceMatrix(timings):
 
 def computeThreshold(timings, S):
 	mh_distance_sum = 0
-	np_timings = [.01 * np.array(x) for x in timings]
+	np_timings = np.array([.01 * np.array(x) for x in timings])
 
 	# check if S has inverse
 	if np.linalg.det(S) != 0:
