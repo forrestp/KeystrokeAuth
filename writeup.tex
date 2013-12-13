@@ -50,14 +50,9 @@ In this paper we describe past work on the topic, introduce our example implemen
 
 \section{Background and Related Work}
 TODO: forrest / carlo / kenny / ameesh
+Many different studies have been done in the past about fingerprinting users based on keystroke cadence, a few of which are referenced below. However, many of these studies focus on running a keylogger in the background of a user session and collecting a large amount of keystrokes before making a decision. The model that these keystrokes are compared to can also be quite large. In contrast, KeystrokeAuth can only compare the timing data from a short password entry to the timing data of a small bank of previously entered passwords. This makes detecting adversaries much more difficult.
 
-describe various features
-\begin{enumerate}
-  \item flight:
-  \item dwell:
-  \item down-down:
-  \item up-up:
-\end{enumerate}
+In our system, we avoided the legwork of comparing multiple algorithms for what may be the best fit for us. Instead, we chose a few of the top performing algorithms described in \[1\] to test in a password context. 
 
 describe various detectors
 
