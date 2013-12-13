@@ -41,24 +41,24 @@
 KeystrokeAuth is an example website implementation that uses keystroke timing to provide stronger user authentication.
 Measuring keystroke timing is a method for passive biometric authentication. 
 Traditional biometric authentication such as fingerprint or retinal scanners require external hardware and is not suited for web service authentication where users may login from a variety of machines. 
-Keystroke timing can be gathered using javascript embedded in the login and registration pages.
+Keystroke timing can be gathered using Javascript embedded in the login and registration pages.
 Thus this method requires no additional hardware.
-The user must enter her password several times during registration instead of just once or twice, but other than that this method is completely unobstrusive.
+The user must enter her password several times during registration instead of just once or twice, but otherwise the method is completely unobstrusive.
 Authenticating passwords with keystroke timing makes it more difficult for an attacker who possesses a user's plaintext password to compromise the account.
 Additionally, it discourages account sharing which may be useful for highly secure systems and premium acconts.
 In this paper we describe past work on the topic, introduce our example implementation called KeystrokeAuth, analyze the added security of our system, and examine a small set of test data.
 
 \section{Background and Related Work}
 
-Many different studies have been done in the past about fingerprinting users based on keystroke cadence, a few of which are referenced below. However, many of these studies focus on running a keylogger in the background of a user session and collecting a large amount of keystrokes before making a decision. The model that these keystrokes are compared to can also be quite large. In contrast, KeystrokeAuth can only compare the timing data from a short password entry to the timing data of a small bank of previously entered passwords. This makes detecting adversaries much more difficult.
+Many different studies have been done in the past about fingerprinting users based on keystroke cadence, a few of which are referenced below. However, many of these studies focus on running a keylogger in the background of a user session and collecting a large amount of keystrokes before making a decision. The training data that these keystrokes are compared to can also be quite large. In contrast, KeystrokeAuth can only compare the timing data from a short password entry to the timing data of a small bank of previously entered passwords. This makes detecting adversaries much more difficult.
 
-In our system, we avoided the legwork of comparing multiple algorithms for what may be the best fit for us. Instead, we chose a few of the top performing algorithms described in {[}1{]} to test in a password context with a much smaller bank of model password timings (in contrast to 400 in the paper). In particular, the Mahalanobis distance described below performed very well in {[}1{]} and is described in more detail in {[}2{]}. We believe that a bank of 400 passwords is unrealistic for most websites to request of a user. In KeystrokeAuth, we settle on 10 password entries upon registration, which is much more reasonable. 
+In our system, we avoided the legwork of comparing multiple algorithms for what may be the best fit for us. Instead, we chose a few of the top performing algorithms described in {[}1{]} to test in a password context with a much smaller bank of training data (in contrast to 400 in the paper). In particular, the Mahalanobis distance described below performed very well in {[}1{]} and is described in more detail in {[}2{]}. We believe that a bank of 400 passwords is unrealistic for most websites to request of a user. In KeystrokeAuth, we settle on 10 password entries upon registration, which is much more reasonable. 
 
 \section{KeystrokeAuth Implementation}
 KeystrokeAuth uses Javascript to capture the timestamps on each keydown and keyup event while typing the password.
 During registration, the user enters her password 10 times.
 The data is sent to the server and KeystrokeAuth computes a model specific to that user and password.
-When logging in, the user enters the password once and KeystrokeAuth compares the new timing data to the registered model.
+When logging in, the user enters the password once and KeystrokeAuth compares the new timing data to the registered training data.
 If the timing data differs too much, the user will not be logged in.
 
 \subsection{Gathering Timing Data}
@@ -73,36 +73,65 @@ During login, only one password entry is gathered. During registration, a counte
 Some tables and logs indicating which of the models passed and failed are printed out to the page after submission of the login page. 
 This is useful for debugging purposes, but should be turned off for a real-world implementation.
 
-
-\subsection{Generating User Timing Model}
-In order to have success with verifying users using keystroke dynamics, we first have to collect a set of training data. The keystroke dynamics that we are interested in include down time, down-down time, flight time, and dwell time which are defined below. 
+\subsection{Generating User Timing Models}
+In order to have success with verifying users using keystroke dynamics, we first have to establish the set of training data. The keystroke dynamics that we are interested in include the following:
 \begin{description}
 	\item[Down time:] The time that each key is pressed down at, where the first key pressed down equates to a time of zero
 	\item[Down-Down time:] The time in-between two consecutive key down events
 	\item[Flight time:] The time in-between a key up and the following key down event. This value can be negative as a key may not be released before the next is pressed down. 
 	\item[Dwell time:] The time that a given key is held down
 \end{description}
-We are able to calculate all of these values from the initial 10 password entries that are passed in during registration. These metrics will be used when a login attempt is received to determine whether or not to authenticate a given user.
+We are able to calculate all of these values from the initial 10 password entries that are passed in during registration. These metrics will be passed to the distance algorithm described below to deterimine if the entry is close enough to permit login.
 
-\subsection{Login Timing Authentication Algorithm}
-In order to determine whether or not the user attempting to log in should be authenticated, we use the timing models described above to compare against the training data. We make use of the mahalanobis distance to compute the similarity between two vectors.  \\
+\subsection{Login Authentication Algorithm}
+In order to determine whether or not the user attempting to log in should be authenticated, we use the timing models described above to compare a password entry against training data. We make use of the Mahalanobis distance to compute the similarity between two vectors.  \\
 \begin{displaymath}
 D_m(\vec{x}) = \sqrt{(\vec{x}-\vec{y})^T S^{-1} (\vec{x}-\vec{y})}
 \end{displaymath} \\
 Mahalanobis distance is used in two different authentication functions. The first function takes the mean of the training data vectors and computes the distance between the login attempt and the computed mean vector. If the distance from the mean vector is below a certain threshold the login attempt is accepted. 
 
-The 2nd function that we employ is takes the login attempt and finds its distance from each of the training vectors. If the $k$ closes distances all fall below a threshold the login attempt is accepted. \\ \\
-A threshold is computed using the training data. We find the Mahalanobis distance between each vector in the training data. We then compute the average distance. The threshold is set to be one deviation away from the mean in the direction of smaller distances. In other words we only accept login attempts where the distance of the attempt is within one deviation from our computed mean distance. 
+The 2nd function that we employ takes the login attempt and finds its distance from each of the training vectors. If the $k$ closes distances all fall below a threshold the login attempt is accepted. \\ \\
+The threshold is computed using the training data. We find the Mahalanobis distance between each vector in the training data. We then compute the average distance. The threshold is set to be one standard deviation away from the mean in the direction of smaller distances. In other words we only accept login attempts where the distance of the attempt is within one deviation from our computed mean distance. We found that this worked better than a universal threshold because some users are more erratic in their password entry.
 
 \section{Security Analysis}
-TODO: forrest
+KeystrokeAuth makes it more difficult for an attacker with knowledge of a user's plaintext password to gain access to the user's account.
+Users should still try to keep their passwords secret.
+Since KeystrokeAuth is intended to augment standard password-based authentication for web services, it must not weaken any of the security featurus of the standard scheme. 
+For it to be useful in practice, the login process must not be any more difficult for actual users.
+At the same time, the login process should be more difficult for an attacker with a user's plaintext password.
+
+The following two terms are useful for describing how KeystrokeAuth meets these goals:
+
+\begin{description}
+  \item[False Negative:] When an authentic user enters the correct password but is not logged in. If the false negative rate is greater than around 1\%, users will likely get annoyed about not being able to log in as consistently.
+  \item[False Positive:] When an attacker enters the correct password and is logged in. If the false positive rate is 100\%, the security is the same as standard password authentication.
+\end{description}
+
+The threshold described in 3.3 can be adjusted to affect the error rates. 
+Making the threshold smaller increases the false negative rate but decreases the false positive rate.
+Alternatively, making the threshold larger decreases the false negative rate and increases the false positive rate. 
+To optimize our authentication algorithm, the threshold is calculated such that the false negative rate is around 1\%.
+Since the false positive rate is significantly less than 100\%, the system is more secure than standard password authentication.
+
+The standard password security strategy allows for the password database to be compromised without revealing the users password.
+KeystrokeAuth was carefully designed not to violate this security feature.
+The timing model for each user is encrypted using a hash of the user's password, as described in section 3.2. 
+An attacker with a compromised copy of the database but no plaintext password would not be able to unencrypt this model, preventing him from using the timing information to guess the password.
+An attacker with the plaintext password but no copy of the database would have no way of determining the user's timing model, so his only option would be to try to log in many times with various typing rhythms. 
+
+An attacker with both the plaintext password and a copy of the database would be able to decrypt the model and use a script to send keypresses at the correct times to compromise the account. 
+Of course, in standard password authentication the attacker wouldn't even need the copy of the database.
+KeystrokeAuth doesn't provide perfect security since the timing authentication can be tricked, but it does provide additional security by making it more difficult to compromise an account.
+
+The data we gathered allowed us to tune the threshold calculation for ourselves, but much more data would be necessary to tune it for arbitrary passwords and typing rhythms. Once this threshold calculation is optimized, the false negative rate can be set very low. 
+At that point the only downside to using KeystrokeAuth is the additional computation necessary for every login and registration.
+Many users might not even notice that keystroke timing is being used for additional authentication.
 
 The calculated data is then encrypted with AES CFB encryption using a salted and hashed (PBKDF2) user password as the key. The salt in this case differs from the salt and hash of the user password that is stored on the server. Thus, for each user, the server stores the username, two different salts, the hashed and salted password, and the encrypted timing data. This ensures that password timing data can not be retrieved with an attack on the database.
 
 
 proof that security is not worse
 
-strategy: make it no less convinient/difficult for users, and at least slightly more secure
 
 \section{Data Collection and Analysis}
 TODO: carlo
