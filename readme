@@ -1,11 +1,15 @@
 Install:
 
-If you want to generate graphs, run 
 
 # pip install -r requirements.txt
 
 Usage:
 
-Open login.html and type in the password field. Submit the form to display timestamps for each key press
+Start the server with
 
-To generate graphs, copy the output from the browser into graphs.py 
+# python __init__.py
+
+Open localhost:5000/register and fill out the form, entering your password 10 times
+
+Open localhost:5000/login to try to log in and view the results 
+
