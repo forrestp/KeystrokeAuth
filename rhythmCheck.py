@@ -82,6 +82,7 @@ def computeCovarianceMatrix(timings):
 	return covariance_matrix
 
 def computeThreshold(timings, S):
+	timings = np.array(timings)
 	mh_distance_sum = 0
 	np_timings = [.01 * np.array(x) for x in timings]
 
@@ -92,7 +93,7 @@ def computeThreshold(timings, S):
 	# compute mean of distances between all learning vector pairings
 	for x in timings:
 		for y in timings:
-			if x != y:
+			if (x != y).any():
 				mh_distance = np.dot(np.dot(np.transpose(x - y), S),(x - y)) ** 0.5
 				mh_distance_sum += mh_distance
 

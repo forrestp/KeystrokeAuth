@@ -20,7 +20,9 @@ if not os.path.isfile("test.db"):
     with app.app_context():
         db.create_all()
 
-
+from feature_functions import *
+features  = [down, dwell, flight, down_down]
+detectors = [checkTimings, checkTimingsK]
 
 @app.route('/', methods=['GET'])
 def index():
@@ -32,53 +34,32 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         testTimings = []
-        testTimings.append(down(json.loads(request.form.get('timings'))))
-        testTimings.append(dwell(json.loads(request.form.get('timings'))))
-        testTimings.append(flight(json.loads(request.form.get('timings'))))
-        testTimings.append(down_down(json.loads(request.form.get('timings'))))
+        for compute_feature in features:
+          testTimings.append(compute_feature(json.loads(request.form.get('timings'))))
         loginSuccess = False
-        timingSuccessK    = [False, False, False, False]
-        timingSuccessMean = [False, False, False, False]
+        results = [[False for i in features] for j in detectors]
         if checkLogin(username, password):
             loginSuccess = True
             realTimings = getTimings(username,password)
             realTimingsData = []
-            realTimingsData.append(down(json.loads(realTimings)))
-            realTimingsData.append(dwell(json.loads(realTimings)))
-            realTimingsData.append(flight(json.loads(realTimings)))
-            realTimingsData.append(down_down(json.loads(realTimings)))
+            for f in features:
+              realTimingsData.append(f(json.loads(realTimings)))
 
             cov_matrix = []
-            cov_matrix.append(computeCovarianceMatrix(realTimingsData[0]))
-            cov_matrix.append(computeCovarianceMatrix(realTimingsData[1]))
-            cov_matrix.append(computeCovarianceMatrix(realTimingsData[2]))
-            cov_matrix.append(computeCovarianceMatrix(realTimingsData[3]))
-
             meanTimings = []
-            meanTimings.append(getMedianTiming(realTimingsData[0]))
-            meanTimings.append(getMedianTiming(realTimingsData[1]))
-            meanTimings.append(getMedianTiming(realTimingsData[2]))
-            meanTimings.append(getMedianTiming(realTimingsData[3]))
+            for timingData in realTimingsData:
+              cov_matrix.append(computeCovarianceMatrix(timingData))
+              meanTimings.append(getMedianTiming(timingData))
 
             thresholds = []
-            thresholds.append(computeThreshold(realTimingsData[0]),cov_matrix[0])
-            thresholds.append(computeThreshold(realTimingsData[1]),cov_matrix[1])
-            thresholds.append(computeThreshold(realTimingsData[2]),cov_matrix[2])
-            thresholds.append(computeThreshold(realTimingsData[3]),cov_matrix[3])
-            print thresholds
+            for processedData in zip(realTimingsData, cov_matrix):
+              thresholds.append(computeThreshold(processedData[0],processedData[1]))
 
-            timingSuccessK[0] = checkTimingsK(testTimings[0], realTimingsData[0], cov_matrix[0], 3, thresholds[0])
-            timingSuccessK[1] = checkTimingsK(testTimings[1], realTimingsData[1], cov_matrix[1], 3, thresholds[1])
-            timingSuccessK[2] = checkTimingsK(testTimings[2], realTimingsData[2], cov_matrix[2], 3, thresholds[2])
-            timingSuccessK[3] = checkTimingsK(testTimings[3], realTimingsData[3], cov_matrix[3], 3, thresholds[3])
-
-            timingSuccessMean[0] = checkTimings(testTimings[0], meanTimings[0], cov_matrix[0], thresholds[0])
-            timingSuccessMean[1] = checkTimings(testTimings[1], meanTimings[1], cov_matrix[1], thresholds[1])
-            timingSuccessMean[2] = checkTimings(testTimings[2], meanTimings[2], cov_matrix[2], thresholds[2])
-            timingSuccessMean[3] = checkTimings(testTimings[3], meanTimings[3], cov_matrix[3], thresholds[3])
+            results[0] = [checkTimingsK(data[0], data[1], data[2], 3, data[3]) for data in zip(testTimings, realTimingsData, cov_matrix, thresholds)]
+            results[1] = [checkTimings(data[0], data[1], data[2], data[3]) for data in zip(testTimings, meanTimings, cov_matrix, thresholds)]
 
         return render_template('login.html', output=testTimings, 
-                loginSuccess=loginSuccess, timingSuccessMean=timingSuccessMean, timingSuccessK=timingSuccessK)
+                loginSuccess=loginSuccess, timingSuccessMean=results[1], timingSuccessK=results[0])
     else:
         return render_template('login.html')
  
@@ -129,32 +110,6 @@ def getTimings(username, password):
         aes = AES.new(aes_hash, AES.MODE_CFB, iv)
         return aes.decrypt(encrypted_timings[16:])
     return ""
-
-''' The various four features/metrics we use for comparison.'''
-def down(data):
-  if (isinstance(data[0], list)):
-    return map(down, data)
-  else:
-    return [d.get('down',0) for d in data]
-
-def dwell(data):
-  if (isinstance(data[0], list)):
-    return map(dwell, data)
-  else:
-    return [d.get('up',0) - d.get('down',0) for d in data]
-
-def flight(data):
-  if (isinstance(data[0], list)):
-    return map(flight, data)
-  else:
-    return [data[i+1].get('down',0) - data[i].get('up',0) for i in range(len(data)-1)]
-
-def down_down(data):
-  if (isinstance(data[0], list)):
-    return map(down_down, data)
-  else:
-    return [data[i+1].get('down',0) - data[i].get('down',0) for i in range(len(data)-1)]
-
 
 if __name__ == '__main__':
     app.debug=True
