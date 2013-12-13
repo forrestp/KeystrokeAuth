@@ -103,14 +103,14 @@ At the same time, the login process should be more difficult for an attacker wit
 The following two terms are useful for describing how KeystrokeAuth meets these goals:
 
 \begin{description}
-  \item[False Negative:] When an authentic user enters the correct password but is not logged in. If the false negative rate is greater than around 1\%, users will likely get annoyed about not being able to log in as consistently.
+  \item[False Negative:] When an authentic user enters the correct password but is not logged in. If the false negative rate is greater than around 30\%, users will get very annoyed about not being able to log in as consistently.
   \item[False Positive:] When an attacker enters the correct password and is logged in. If the false positive rate is 100\%, the security is the same as standard password authentication.
 \end{description}
 
 The threshold described in 3.3 can be adjusted to affect the error rates. 
 Making the threshold smaller increases the false negative rate but decreases the false positive rate.
 Alternatively, making the threshold larger decreases the false negative rate and increases the false positive rate. 
-To optimize our authentication algorithm, the threshold is calculated such that the false negative rate is around 1\%.
+To optimize our authentication algorithm, the threshold is calculated such that the false negative rate is around 30\%.
 Since the false positive rate is significantly less than 100\%, the system is more secure than standard password authentication.
 
 The standard password security strategy allows for the password database to be compromised without revealing the users password.
