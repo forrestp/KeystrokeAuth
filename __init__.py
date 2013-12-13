@@ -62,9 +62,9 @@ def login():
 
             thresholds = []
             thresholds.append(computeThreshold(realTimingsData[0]),cov_matrix[0])
-            thresholds.append(computeThreshold(realTimingsData[0]),cov_matrix[0])
-            thresholds.append(computeThreshold(realTimingsData[0]),cov_matrix[0])
-            thresholds.append(computeThreshold(realTimingsData[0]),cov_matrix[0])
+            thresholds.append(computeThreshold(realTimingsData[1]),cov_matrix[1])
+            thresholds.append(computeThreshold(realTimingsData[2]),cov_matrix[2])
+            thresholds.append(computeThreshold(realTimingsData[3]),cov_matrix[3])
             print thresholds
 
             timingSuccessK[0] = checkTimingsK(testTimings[0], realTimingsData[0], cov_matrix[0], 3, thresholds[0])
