@@ -62,9 +62,16 @@ When logging in, the user enters the password once and KeystrokeAuth compares th
 If the timing data differs too much, the user will not be logged in.
 
 \subsection{Gathering Timing Data}
-Timing data is gathered with Javascript event handlers on key presses in the registration and login pages. Any key that is not a valid password character, e.g. backspace or the arrow keys, causes the entire password field to reset. This ensures we only get timing data for a continous entry of password characters.
+Timing data is gathered with Javascript event handlers on key presses in the registration and login pages.
+Timing data is only gathered when the focus is on the password field. The password field is reset whenever it gains focus (via the onFocus event handler).  
+While gathering timing data, any key that is not a valid password character, e.g. backspace or the arrow keys, causes the entire password field to reset.
+This ensures we only get timing data for a continous entry of password characters.
 
-Addtionally, some tables and logs indicating which of the models passed and failed are printed out to the page after submission. This is useful for debugging purposes, but should be turned off for an real-world implementation.
+The timing data for each password entry consists of a list of objects with keycode, keyup, and keydown fields. The keyup and keydown fields are timestamps normalized by subtracting the keydown timestamp for the first character in the password entry. 
+During login, only one password entry is gathered. During registration, a counter keeps track of enteries and won't submit until the password has been entered 10 times.
+
+Some tables and logs indicating which of the models passed and failed are printed out to the page after submission of the login page. 
+This is useful for debugging purposes, but should be turned off for a real-world implementation.
 
 
 \subsection{Generating User Timing Model}
