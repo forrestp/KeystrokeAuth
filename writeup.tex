@@ -81,8 +81,9 @@ In order to have success with verifying users using keystroke dynamics, we first
 	\item[Flight time:] The time in-between a key up and the following key down event. This value can be negative as a key may not be released before the next is pressed down. 
 	\item[Dwell time:] The time that a given key is held down
 \end{description}
-We are able to calculate all of these values from the initial 10 password entries that are passed in during registration. The calculated data is then encrypted with the users password and then stored for the given user. These metrics will be used when a login attempt is received to determine whether or not to authenticate a given user.
-TODO: Ameesh add stuff about how things are actually encypted
+We are able to calculate all of these values from the initial 10 password entries that are passed in during registration. The calculated data is then encrypted with AES CFB encryption using a salted and hashed (PBKDF2) user password as the key. The salt in this case differs from the salt and hash of the user password that is stored on the server. Thus, for each user, the server stores the username, two different salts, the hashed and salted password, and the encrypted timing data.
+
+These metrics will be used when a login attempt is received to determine whether or not to authenticate a given user.
 
 \subsection{Login Timing Authentication}
 In order to determine whether or not the user attempting to log in should be authenticated, we collect the down time, the down-down time, the flight time, and the dwell time to compare against the training data. We make use of the mahalanobis distance to compute the similarity between two vectors.  \\
