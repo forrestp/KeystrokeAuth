@@ -83,16 +83,16 @@ def computeCovarianceMatrix(timings):
 
 def computeThreshold(timings, S):
 	mh_distance_sum = 0
-	np_timings = [.01 * np.array(x) for x in timings]
+	np_timings = np.array([.01 * np.array(x) for x in timings])
 
 	# check if S has inverse
 	if np.linalg.det(S) != 0:
 		S = np.linalg.inv(S)
 
 	# compute mean of distances between all learning vector pairings
-	for x in timings:
-		for y in timings:
-			if x != y:
+	for x in np_timings:
+		for y in np_timings:
+			if (x != y).any():
 				mh_distance = np.dot(np.dot(np.transpose(x - y), S),(x - y)) ** 0.5
 				mh_distance_sum += mh_distance
 
