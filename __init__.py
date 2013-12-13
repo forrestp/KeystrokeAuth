@@ -47,26 +47,36 @@ def login():
             realTimingsData.append(dwell(json.loads(realTimings)))
             realTimingsData.append(flight(json.loads(realTimings)))
             realTimingsData.append(down_down(json.loads(realTimings)))
+
             cov_matrix = []
             cov_matrix.append(computeCovarianceMatrix(realTimingsData[0]))
             cov_matrix.append(computeCovarianceMatrix(realTimingsData[1]))
             cov_matrix.append(computeCovarianceMatrix(realTimingsData[2]))
             cov_matrix.append(computeCovarianceMatrix(realTimingsData[3]))
+
             meanTimings = []
             meanTimings.append(getMedianTiming(realTimingsData[0]))
             meanTimings.append(getMedianTiming(realTimingsData[1]))
             meanTimings.append(getMedianTiming(realTimingsData[2]))
             meanTimings.append(getMedianTiming(realTimingsData[3]))
-            # print meanTimings
-            # print testTimings
-            timingSuccessK[0] = checkTimingsK(testTimings[0], realTimingsData[0], cov_matrix[0], 3)
-            timingSuccessK[1] = checkTimingsK(testTimings[1], realTimingsData[1], cov_matrix[1], 3, 41)
-            timingSuccessK[2] = checkTimingsK(testTimings[2], realTimingsData[2], cov_matrix[2], 3, 9)
-            timingSuccessK[3] = checkTimingsK(testTimings[3], realTimingsData[3], cov_matrix[3], 3, 24.5)
-            timingSuccessMean[0] = checkTimings(testTimings[0], meanTimings[0], cov_matrix[0])
-            timingSuccessMean[1] = checkTimings(testTimings[1], meanTimings[1], cov_matrix[1], 42.5)
-            timingSuccessMean[2] = checkTimings(testTimings[2], meanTimings[2], cov_matrix[2], 9)
-            timingSuccessMean[3] = checkTimings(testTimings[3], meanTimings[3], cov_matrix[3], 25.0)
+
+            thresholds = []
+            thresholds.append(computeThreshold(realTimingsData[0]),cov_matrix[0])
+            thresholds.append(computeThreshold(realTimingsData[0]),cov_matrix[0])
+            thresholds.append(computeThreshold(realTimingsData[0]),cov_matrix[0])
+            thresholds.append(computeThreshold(realTimingsData[0]),cov_matrix[0])
+            print thresholds
+
+            timingSuccessK[0] = checkTimingsK(testTimings[0], realTimingsData[0], cov_matrix[0], 3, thresholds[0])
+            timingSuccessK[1] = checkTimingsK(testTimings[1], realTimingsData[1], cov_matrix[1], 3, thresholds[1])
+            timingSuccessK[2] = checkTimingsK(testTimings[2], realTimingsData[2], cov_matrix[2], 3, thresholds[2])
+            timingSuccessK[3] = checkTimingsK(testTimings[3], realTimingsData[3], cov_matrix[3], 3, thresholds[3])
+
+            timingSuccessMean[0] = checkTimings(testTimings[0], meanTimings[0], cov_matrix[0], thresholds[0])
+            timingSuccessMean[1] = checkTimings(testTimings[1], meanTimings[1], cov_matrix[1], thresholds[1])
+            timingSuccessMean[2] = checkTimings(testTimings[2], meanTimings[2], cov_matrix[2], thresholds[2])
+            timingSuccessMean[3] = checkTimings(testTimings[3], meanTimings[3], cov_matrix[3], thresholds[3])
+
         return render_template('login.html', output=testTimings, 
                 loginSuccess=loginSuccess, timingSuccessMean=timingSuccessMean, timingSuccessK=timingSuccessK)
     else:

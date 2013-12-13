@@ -56,6 +56,12 @@ def checkTimingsK(testTiming, realTimings, S, k, threshold=None):
 		return True
 	return False
 
+# function to calculate the manhatan distance 
+# 
+def manhattan_distance(testVector, realVector):
+	distance = 0
+	return distance
+
 
 # takes in initial timing data
 # returns array with mean times of keystrokes
@@ -74,6 +80,24 @@ def computeCovarianceMatrix(timings):
 	np_temp = .01 * np.array(timings)
 	covariance_matrix = np.cov(np_temp.T)
 	return covariance_matrix
+
+def computeThreshold(timings, S):
+	mh_distance_sum = 0
+	np_timings = [.01 * np.array(x) for x in timings]
+
+	# check if S has inverse
+	if np.linalg.det(S) != 0:
+		S = np.linalg.inv(S)
+
+	# compute mean of distances between all learning vector pairings
+	for x in timings:
+		for y in timings:
+			if x != y:
+				mh_distance = np.dot(np.dot(np.transpose(x - y), S),(x - y)) ** 0.5
+				mh_distance_sum += mh_distance
+
+	return mh_distance_sum / (len(timings)*(len(timings)-1))
+				
 
 
 # take in data for key strokes

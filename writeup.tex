@@ -17,6 +17,8 @@
 
 \usepackage{epstopdf}
 
+\usepackage{enumitem}
+\setdescription{leftmargin=\parindent,labelindent=1cm}
 
 \title{KeystrokeAuth}
 \author{
@@ -50,7 +52,7 @@ In this paper we describe past work on the topic, introduce our example implemen
 TODO: forrest / carlo / kenny / ameesh
 
 describe various features
-\begin{enumerate}[-]
+\begin{enumerate}
   \item flight:
   \item dwell:
   \item down-down:
@@ -72,11 +74,23 @@ TODO: forrest
 Gather code, uptime, downtime --> compute various features
 
 \subsection{Generating User Timing Model}
-TODO: ameesh / kenny  ***make this part feature-agnostic
+In order to have success with verifying users using keystroke dynamics, we first have to collect a set of training data. The keystroke dynamics that we are interested in include down time, down-down time, flight time, and dwell time which are defined below. 
+\begin{description}
+	\item[Down time:] The time that each key is pressed down at, where the first key pressed down equates to a time of zero
+	\item[Down-Down time:] The time in-between two consecutive key down events
+	\item[Flight time:] The time in-between a key up and the following key down event. This value can be negative as a key may not be released before the next is pressed down. 
+	\item[Dwell time:] The time that a given key is held down
+\end{description}
+We are able to calculate all of these values from the initial 10 password entries that are passed in during registration. The calculated data is then encrypted with the users password and then stored for the given user. These metrics will be used when a login attempt is received to determine whether or not to authenticate a given user.
+TODO: Ameesh add stuff about how things are actually encypted
 
 \subsection{Login Timing Authentication}
-TODO: ameesh / kenny  ***make this part feature-agnostic 
-
+In order to determine whether or not the user attempting to log in should be authenticated, we collect the down time, the down-down time, the flight time, and the dwell time to compare against the training data. We make use of the mahalanobis distance to compute the similarity between two vectors.  \\
+\begin{displaymath}
+D_m(\vec{x}) = \sqrt{(\vec{x}-\vec{y})^T S^{-1} (\vec{x}-\vec{y})}
+\end{displaymath} \\
+We make use of the mahalanobis distance in both of authentication functions. The first function we use takes the mean of the training data vectors and computes the distance between the login attempt and the computed mean vector. If the distance from the mean vector is below a certain threshold, then the login attempt is accepted. The 2nd function that we employ is we take the login attempt and find its distance from each of the training vectors. If the $k$ closes distances all fall below a threshold, then the login attempt is accepted. \\ \\
+The threshold is computed using the training data. We find the mahalanobis distance between each vector in the training data. We then compute the average distance. The threshold is set to be one deviation away from the mean in the direction of smaller distances. In other words we only accept login attempts where the distance of the attempt is at least one deviation than our computed mean distance. 
 \section{Security Analysis}
 TODO: forrest
 
