@@ -14,6 +14,9 @@
 \usepackage{doc}
 
 \usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \usepackage{epstopdf}
 
@@ -23,9 +26,9 @@
 \title{KeystrokeAuth}
 \author{
   Forrest Pieper\\
-  Carlo Biedenharn\\
   Kenneth Seibert\\
-  Ameesh Goyal
+  Ameesh Goyal\\
+  Carlo Biedenharn
 }
 \date{December 10th, 2013}
 
@@ -43,9 +46,9 @@ Measuring keystroke timing is a method for passive biometric authentication.
 Traditional biometric authentication such as fingerprint or retinal scanners require external hardware and is not suited for web service authentication where users may login from a variety of machines. 
 Keystroke timing can be gathered using javascript embedded in the login and registration pages.
 Thus this method requires no additional hardware.
-The user must enter her password several times during registration instead of just once or twice, but other than that this method is completely unobstrusive.
+The user must enter her password several times during registration instead of just once or twice, but other than that this method is completely unobtrusive.
 Authenticating passwords with keystroke timing makes it more difficult for an attacker who possesses a user's plaintext password to compromise the account.
-Additionally, it discourages account sharing which may be useful for highly secure systems and premium acconts.
+Additionally, it discourages account sharing which may be useful for highly secure systems and premium accounts.
 In this paper we describe past work on the topic, introduce our example implementation called KeystrokeAuth, analyze the added security of our system, and examine a small set of test data.
 
 \section{Background and Related Work}
@@ -92,24 +95,87 @@ TODO: forrest
 
 proof that security is not worse
 
-strategy: make it no less convinient/difficult for users, and at least slightly more secure
+strategy: make it no less convenient/difficult for users, and at least slightly more secure
 
 \section{Data Collection and Analysis}
-TODO: carlo
 
 \subsection{Data Overview}
-% how you gathered data
-% graphs demonstrating biometric uniqueness
+Timing data was recorded from twelve participants typing three phrases. In an effort to record relevant data while not divulging the passwords of the participants, familiar phrases were used. Each participant was instructed to type each phrase at least ten times, in any order. Each participant had to type the same three phrases: \textit{facebookgoogle}, \textit{phideltatheta}, and \textit{biedenharn}.\\
 
-\subsection{Feature Comparison} %dwell vs flight vs down-down etc.
-%table of which features they pass both detectors 
+The phrase \textit{facebookgoogle} was chosen as it is universally familiar to our participants, resulting in very consistent typing rhythms. \textit{phideltatheta} was used because a portion of our participants were familiar with the phrase. The last phrase, \textit{biedenharn}, was chosen as an example of an attack where \textit{biedenharn} was the account password of a user and the participants were trying to compromise the account. Like a password, \textit{biedenharn} was not familiar to any of our participants except for one of the authors of this paper.\\
 
+Even when looking at the messy graph in Figure \ref{full_facebookgoogle_flight}, it is clear that individuals have unique typing rhythms with familar words. Filtering the data down to a few participants in Figure \ref{multi_facebookgoogle_flight} shows this more directly.
+
+\begin{figure}[H]
+  \begin{subfigure}[b]{75mm}
+    \centering
+    \includegraphics[width=70mm]{facebookgoogle_flight_final.png}
+    \caption{All data}
+    \label{full_facebookgoogle_flight}
+  \end{subfigure}
+  \begin{subfigure}[b]{75mm}
+    \centering
+    \includegraphics[width=70mm]{facebookgoogle_multi_flight_final.png}
+    \caption{Three individuals}
+    \label{multi_facebookgoogle_flight}
+  \end{subfigure}
+  \caption{Flight measurements for participants typing \textit{facebookgoogle}. Each distinct color represents an individual.}
+\end{figure}
+
+\subsection{Feature Comparison} 
+
+In practice, the different features produce variably unique datasets. Though the graphs comparing the \textit{up} and \textit{down} features are unique, it is easy to see in figure \ref{all_graphs:down} that with practice an attacker might be able to replicate a victim's data. However with the \textit{flight} and \textit{down-down} graphs (figures \ref{all_graphs:flight} and \ref{all_graphs:down-down}), the results are very consistent and unique. The green dataset has mostly positive flight times while the blue dataset has mainly negative times.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.3\textwidth}
+    \includegraphics[width=\textwidth]{biedenharn_jordan_down_final.png}
+    \caption{down}
+    \label{all_graphs:down}
+  \end{subfigure}%
+  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+    %(or a blank line to force the subfigure onto a new line)
+  \begin{subfigure}[b]{0.3\textwidth}
+    \includegraphics[width=\textwidth]{biedenharn_jordan_down-down_final.png}
+    \caption{down-down}
+    \label{all_graphs:down-down}
+  \end{subfigure}
+  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+    %(or a blank line to force the subfigure onto a new line)
+  \begin{subfigure}[b]{0.3\textwidth}
+    \includegraphics[width=\textwidth]{biedenharn_jordan_dwell_final.png}
+    \caption{dwell}
+    \label{all_graphs:dwell}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{0.3\textwidth}
+    \includegraphics[width=\textwidth]{biedenharn_jordan_up_final.png}
+    \caption{up}
+    \label{all_graphs:up}
+  \end{subfigure}%
+  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+    %(or a blank line to force the subfigure onto a new line)
+  \begin{subfigure}[b]{0.3\textwidth}
+    \includegraphics[width=\textwidth]{biedenharn_jordan_up-up_final.png}
+    \caption{up-up}
+    \label{all_graphs:up-up}
+  \end{subfigure}
+  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+    %(or a blank line to force the subfigure onto a new line)
+  \begin{subfigure}[b]{0.3\textwidth}
+    \includegraphics[width=\textwidth]{biedenharn_jordan_flight_final.png}
+    \caption{flight}
+    \label{all_graphs:flight}
+  \end{subfigure}
+  \caption{Comparison of the six features. The blue data represents the phrase \textit{biedenharn} typed by somebody familiar with the phrase. The green data represents somebody unfamilar with the phrase.}
+  \label{all_graphs}
+\end{figure}
 
 \subsection{Error Rates}    %false positive (someone else logs in) and false negative (I can't log in)
 
 Goal: Find ideal thresholds and weights for each feature that give 1\% false negative rate
 ideal would be  .001\% false positive, but anything less than 100\% is an improvement over state of the art
-Compromise: increase false positive rate to accomodate 1\% false negative
+Compromise: increase false positive rate to accommodate 1\% false negative
 
 \section{Conclusion}
 TODO: forrest / carlo / kenny / ameesh
